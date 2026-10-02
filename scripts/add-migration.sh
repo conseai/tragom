@@ -10,7 +10,9 @@ fi
 cd "$(dirname "$0")/.."
 
 docker compose run --rm --no-deps --entrypoint sh api -c \
-  "dotnet tool restore && dotnet ef migrations add '$NAME' --project TravelApp.Api --output-dir Data/Migrations"
+  "dotnet tool restore && \
+   dotnet restore TravelApp.Api/TravelApp.Api.csproj && \
+   dotnet ef migrations add '$NAME' --project TravelApp.Api --output-dir Data/Migrations"
 
 echo ""
 echo "Migration '$NAME' created in backend/TravelApp.Api/Data/Migrations."
