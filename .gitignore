@@ -1,0 +1,19 @@
+# Local secrets
+.env
+
+# .NET
+backend/**/bin/
+backend/**/obj/
+*.user
+*.suo
+.vs/
+
+# Node / Angular (frontend/.gitignore has more)
+node_modules/
+frontend/dist/
+frontend/.angular/
+
+# IDEs and OS
+.idea/
+.DS_Store
+Thumbs.db

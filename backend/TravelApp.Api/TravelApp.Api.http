@@ -1,0 +1,28 @@
+# Open this file in Rider, Visual Studio or VS Code (REST Client extension)
+# and click "Send request" above each call.
+@api = http://localhost:8080
+
+### Health: API + database + PostGIS version
+GET {{api}}/api/health
+
+### All places
+GET {{api}}/api/places
+
+### Places within 50 km of Novi Sad
+GET {{api}}/api/places/nearby?lat=45.2671&lng=19.8335&radiusKm=50
+
+### One place
+GET {{api}}/api/places/1
+
+### Create a place
+POST {{api}}/api/places
+Content-Type: application/json
+
+{
+  "name": "Palić Lake",
+  "category": "Nature",
+  "region": "North Bačka",
+  "description": "Lake resort near Subotica with Art Nouveau villas.",
+  "latitude": 46.1017,
+  "longitude": 19.7614
+}

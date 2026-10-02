@@ -1,0 +1,45 @@
+@use './theme' as *;
+
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
+}
+
+html {
+  -webkit-text-size-adjust: 100%;
+}
+
+body {
+  margin: 0;
+  font-family: $font;
+  font-size: 1rem;
+  line-height: 1.5;
+  color: $ink;
+  background: $paper;
+}
+
+h1,
+h2,
+h3,
+p {
+  margin: 0;
+}
+
+code {
+  font-size: 0.875em;
+  background: rgba($forest, 0.08);
+  padding: 0.05em 0.3em;
+  border-radius: 3px;
+}
+
+:focus-visible {
+  outline: 3px solid $sunflower;
+  outline-offset: 2px;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  * {
+    transition: none !important;
+  }
+}

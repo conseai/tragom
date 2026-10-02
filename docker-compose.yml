@@ -1,0 +1,75 @@
+# Local development environment: PostgreSQL/PostGIS + .NET API + Angular
+# Start everything:   docker compose up --build
+# Stop everything:    docker compose down
+name: travel-app
+
+services:
+  db:
+    image: postgis/postgis:17-3.5
+    restart: unless-stopped
+    environment:
+      POSTGRES_DB: ${DB_NAME}
+      POSTGRES_USER: ${DB_USER}
+      POSTGRES_PASSWORD: ${DB_PASSWORD}
+    ports:
+      - "${DB_PORT:-5432}:5432"
+    volumes:
+      - pgdata:/var/lib/postgresql/data
+      - ./db/init:/docker-entrypoint-initdb.d:ro
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U $${POSTGRES_USER} -d $${POSTGRES_DB}"]
+      interval: 5s
+      timeout: 5s
+      retries: 20
+
+  api:
+    build:
+      context: ./backend
+      target: dev
+    environment:
+      ASPNETCORE_ENVIRONMENT: Development
+      ASPNETCORE_URLS: http://+:8080
+      ConnectionStrings__Default: Host=db;Port=5432;Database=${DB_NAME};Username=${DB_USER};Password=${DB_PASSWORD}
+    ports:
+      - "${API_PORT:-8080}:8080"
+    volumes:
+      - ./backend:/src
+      # Container build output stays inside the container, so it never clashes with your IDE builds
+      - /src/TravelApp.Api/bin
+      - /src/TravelApp.Api/obj
+      # NuGet package cache survives restarts, so packages download only once
+      - nuget:/root/.nuget/packages
+    depends_on:
+      db:
+        condition: service_healthy
+
+  web:
+    build:
+      context: ./frontend
+      target: dev
+    ports:
+      - "${WEB_PORT:-4200}:4200"
+    volumes:
+      - ./frontend:/app
+      # node_modules and the Angular cache come from the image, not from your laptop
+      - /app/node_modules
+      - /app/.angular
+    depends_on:
+      - api
+
+  # Optional database UI: docker compose --profile tools up -d pgadmin  ->  http://localhost:5050
+  pgadmin:
+    image: dpage/pgadmin4:9
+    profiles: ["tools"]
+    environment:
+      PGADMIN_DEFAULT_EMAIL: ${PGADMIN_EMAIL:-admin@example.com}
+      PGADMIN_DEFAULT_PASSWORD: ${PGADMIN_PASSWORD:-admin}
+      PGADMIN_CONFIG_SERVER_MODE: "False"
+    ports:
+      - "5050:80"
+    depends_on:
+      - db
+
+volumes:
+  pgdata:
+  nuget:
